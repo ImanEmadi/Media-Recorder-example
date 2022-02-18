@@ -10,10 +10,12 @@ const multerMW = multer({
     storage: multer.diskStorage({
         destination: path.join(__dirname, "/temp"),
         filename: (req, file: Express.Multer.File, cb) => {
-            cb(null, Math.ceil(Math.random() * 9e7).toString(28) + "_" + file.originalname);
+            cb(null, Math.ceil(Math.random() * 9e10).toString(28));
         }
     })
 });
+
+
 
 app.use((req, res, next) => {
     res.header({
@@ -41,11 +43,22 @@ app.get('/', (req, res, next) => {
     res.status(200).send("ALL FINE ! cheers mate !");
 });
 
-app.post('/record', multerMW.any(), (req, res, next) => {
-    Array.isArray(req.files) && req.files.forEach(f => {
-        fs.renameSync(f.path, path.join(__dirname, "/files/", f.filename + f.originalname))
+const uploadPath = path.join(__dirname, '/files');
+app.post('/record', (req, res, next) => {
+    multerMW.any()(req, res, function (err) {
+        if (err) {
+            console.error(err);
+            return res.status(503).send('multer error');
+        }
+        if (!fs.existsSync(uploadPath)) {
+            console.log('creating files dir');
+            fs.mkdirSync(uploadPath);
+        }
+        Array.isArray(req.files) && req.files.forEach(f => {
+            fs.renameSync(f.path, path.join(__dirname, "/files/", f.filename + ".mkv")); // for keeping original extension => + "f.originalname"
+        });
+        res.status(200).send('files received!');
     });
-    res.status(200).send('files received!');
 });
 
 

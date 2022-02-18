@@ -8,5 +8,11 @@
       "allowJs": true,
       "moduleResolution": "node",
       "downlevelIteration": true,
-    }
+    },
+    "exclude":[
+      "node_modules",
+      "webpack.config.js",
+      "dist",
+      "archive/**/*"
+  ]
   }

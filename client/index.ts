@@ -36,6 +36,7 @@ async function record() {
     try {
         const userDisplayStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
         const userAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        btn.innerText = "End recording";
         const userStream = new MediaStream(
             userDisplayStream
                 .getVideoTracks()
@@ -44,7 +45,7 @@ async function record() {
                         .getAudioTracks()
                 )
         );
-        btn.innerText = active ? "End recording" : "Start recording";
+
         userVid.srcObject = userStream;
         userVid.play();
         recorder = new MediaRecorder(userStream, { mimeType: 'video/webm' });
@@ -63,6 +64,7 @@ function stop() {
     console.log('stopping recorder...');
     recorder.stop();
     userVid.pause();
+    btn.innerText = "Start recording";
 }
 
 function errorHandler(e: MediaRecorderErrorEvent) {
@@ -72,11 +74,9 @@ function errorHandler(e: MediaRecorderErrorEvent) {
 async function upload(f: File) {
     console.log('uploading recorded data', f);
     const data = new FormData();
+    data.append('f', f)
     try {
         const result = await fetch('http://localhost:3000/record', {
-            headers: {
-                'Content-length': f.size.toString()
-            },
             method: 'POST',
             credentials: 'include',
             body: data
