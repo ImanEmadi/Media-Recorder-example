@@ -4,7 +4,7 @@ const userVid = document.getElementById('user-vid') as HTMLMediaElement;
 const btn = document.querySelector('button');
 let active = false;
 
-btn.addEventListener('click', async function () {
+btn.addEventListener('click',  function () {
     if (active)
         stop();
     else
